@@ -6,13 +6,29 @@ y = []
 #Radius des Kreises
 radius = 300
 
-#Anzahl Punkte im Viertelkreis und im Viertelquadrat
+#Zähler für die Anzahl Punkte im Viertelkreis und im Viertelquadrat
 counter_circle = 1
 counter_square = 1
 
-#Approximation von Pi
-pi_approx = -1
- 
+#Liste der Approximationen von Pi
+pi_approx = []
+
+#Anzahl angezeigter Punkte
+points_shown = 0
+
+#Maximale Anzahl berechneter Punkte
+points_max = 2000
+
+# Globale Variablen für Schieberegler von Simon Hefti
+# movingMode (Boolean): True, wenn der Schieber (Kreis) in Bewegung ist, False wenn nicht
+# pointerPos (Integer): Position des Pointers in Pixeln
+# pointerVal (Float):   Eingestellter Wert (0 - 100)
+movingMode = False
+pointerPos = 0
+pointerVal = 0.0
+
+
+
 
 def setup(): #Initialisierung
     
@@ -21,7 +37,8 @@ def setup(): #Initialisierung
     global y
     global counter_circle
     global counter_square
-    global  pi_approx
+    global pi_approx
+    global points_max
     
     #Fenstergrösse und Hintergrundfarbe
     size(600,400)
@@ -33,9 +50,8 @@ def setup(): #Initialisierung
     
     frameRate(100) #Frequenz der draw-Funktion
     
-    
     #Zufällige Koordinatenliste erstellen und Punkte zählen
-    for i in range(0, 20):
+    for i in range(0, points_max):
         x.append(int(random(10,310)))
         y.append(int(random(10,310)))
         
@@ -46,8 +62,8 @@ def setup(): #Initialisierung
             counter_circle = counter_circle + 1
             counter_square = counter_square + 1
             
-    #Approximation von Pi
-    pi_approx = round(4 * float(counter_circle) / float((counter_circle + counter_square)), 7) #Conversion to float notwendig, da int / int wieder int gibt
+        #Approximation von Pi
+        pi_approx.append(round(4 * float(counter_circle) / float((counter_circle + counter_square)), 7)) #Conversion to float notwendig, da int / int wieder int gibt
     
     
 
@@ -60,9 +76,19 @@ def draw(): #Betriebsmodus
     global counter_circle
     global counter_square
     global pi_approx
+    global pointerVal
+    global points_shown
+    global points_max
     
     #Hintergrund weiss, damit Animation funktioniert
     background(255,255,255)
+    
+    #Schieberegler zeichnen
+    draw_ruler(50, 350, 500)
+    
+    #Schieberegler bestimmt, wieviele Punkte gezeigt werden
+    points_shown = int(pointerVal * points_max)
+
     
     #Grundfigur
     noFill()
@@ -71,10 +97,69 @@ def draw(): #Betriebsmodus
     
 
     #Zufallspunkte zeichnen
-    for i in range(0, 20):
+    for i in range(0, points_shown):
         ellipse(x[i], y[i], 5, 5)
 
         
     #Pi Texte
-    text("Pi = " + str(pi_approx), 400, 300)
-    text("Pi = 3.1415926", 400, 360)
+    text("Pi = " + str(pi_approx[points_shown]), 400, 100)
+    text("Pi = 3.1415926", 400, 160)
+    
+    
+
+
+'''
+' Schieberegler
+' Simon Hefti, Okt. 2020
+'''
+# Funktion: Schieberegler generieren
+# objX:      X-Position des Reglers
+# objY:      Y-Position des Reglers
+# objLength: Länge des Reglers
+def draw_ruler(objX, objY, objLength):
+    global movingMode
+    global pointerPos
+    global pointerVal
+    
+    # Schieber einstellen
+    pointerRadius = 24
+    if pointerPos == 0:
+        pointerPos = objX
+    
+    # Linie zeichnen
+    #fill(0)
+    #strokeWeight(6)
+    line(objX, objY, objX + objLength, objY)
+    #fill(0)
+    #strokeWeight(2)
+    
+    # Überprüfen ob Schieber angeklickt worden ist --> Bewegungsmodus aktivieren
+    if mouseX > pointerPos - pointerRadius and mouseX < pointerPos + pointerRadius and mouseY > objY - pointerRadius and mouseY < objY + pointerRadius and mousePressed == True:
+        movingMode = True
+    
+    # Wenn keine Maustaste gedrückt ist --> Bewegungsmodus deaktivieren
+    if mousePressed == False:
+        movingMode = False
+        cursor(ARROW)
+    
+    # Bei aktiviertem Bewegungsmodus
+    if movingMode == True:
+        cursor(HAND)
+        
+        # Schieber der Line entlang bewegen
+        if mouseX > objX and mouseX < objX + objLength:
+            pointerPos = mouseX
+        
+        # Wenn Maus ausserhalb der Linie, Schieber am Start oder Ende fixieren
+        else:
+            if mouseX < objX:
+                pointerPos = objX
+            if mouseX > objX:
+                pointerPos = objX + objLength
+
+    # Schieber zeichnen            
+    circle(pointerPos, objY, pointerRadius)
+    
+    # Eingestellter Wert anhand der Schieberposition ermitteln (modifiziert)
+    pointerVal =  (pointerPos - objX) / float(objLength)
+            

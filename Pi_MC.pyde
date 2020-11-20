@@ -17,7 +17,7 @@ pi_approx = []
 points_shown = 0
 
 #Maximale Anzahl berechneter Punkte
-points_max = 2000
+points_max = 1000
 
 # Globale Variablen für Schieberegler von Simon Hefti
 # movingMode (Boolean): True, wenn der Schieber (Kreis) in Bewegung ist, False wenn nicht
@@ -52,8 +52,8 @@ def setup(): #Initialisierung
     
     #Zufällige Koordinatenliste erstellen und Punkte zählen
     for i in range(0, points_max):
-        x.append(int(random(10,310)))
-        y.append(int(random(10,310)))
+        x.append(int(random(0,300)))
+        y.append(int(random(0,300)))
         
         #x^2 + y^2 <? radius^2
         if (pow(x[i], 2) + pow(y[i], 2)) < pow(radius, 2):
@@ -94,15 +94,22 @@ def draw(): #Betriebsmodus
     noFill()
     square(10, 10, radius)
     arc(10, 310, 2 * radius, 2 * radius, -HALF_PI, 0)
+    arc(10, 10, 2 * radius, 2 * radius, 0, HALF_PI)
+
     
 
     #Zufallspunkte zeichnen
     for i in range(0, points_shown):
-        ellipse(x[i], y[i], 5, 5)
-
+        #x^2 + y^2 <? radius^2
+        if (pow(x[i], 2) + pow(y[i], 2)) < pow(radius, 2):
+            fill(255, 0, 0)
+        else:
+            fill(0, 255, 0)
+        ellipse(x[i] + 10, -y[i] + 310, 5, 5)
+    fill(0)
         
     #Pi Texte
-    text("Pi = " + str(pi_approx[points_shown]), 400, 100)
+    text("Pi = " + str(pi_approx[points_shown-1]), 400, 100)
     text("Pi = 3.1415926", 400, 160)
     
     

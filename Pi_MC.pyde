@@ -59,7 +59,7 @@ def setup(): #Initialisierung
         if (pow(x[i], 2) + pow(y[i], 2)) < pow(radius, 2):
             counter_circle = counter_circle + 1
         else:
-            counter_circle = counter_circle + 1
+            #counter_circle = counter_circle + 1
             counter_square = counter_square + 1
             
         #Approximation von Pi
@@ -109,6 +109,7 @@ def draw(): #Betriebsmodus
     fill(0)
         
     #Pi Texte
+    #text("Pi = 4*" + str(counter_circle) + "/" + str(counter_square) + str(pi_approx[points_shown-1]), 400, 100)
     text("Pi = " + str(pi_approx[points_shown-1]), 400, 100)
     text("Pi = 3.1415926", 400, 160)
     
